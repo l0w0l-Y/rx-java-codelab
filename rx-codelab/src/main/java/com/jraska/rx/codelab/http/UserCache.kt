@@ -10,7 +10,7 @@ object UserCache {
     return Observable.fromCallable { getUserSync(login) }
   }
 
-  private fun getUserSync(login: String): User {
+  fun getUserSync(login: String): User {
     return User(login, "", true, "")
   }
 }
