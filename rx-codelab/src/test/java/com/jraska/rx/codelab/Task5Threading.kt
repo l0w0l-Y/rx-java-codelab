@@ -2,6 +2,7 @@ package com.jraska.rx.codelab
 
 import com.jraska.rx.codelab.http.GitHubConverter
 import com.jraska.rx.codelab.http.HttpModule
+import io.reactivex.schedulers.Schedulers
 import org.junit.After
 import org.junit.Test
 
@@ -20,6 +21,9 @@ class Task5Threading {
     val reposObservable = gitHubApi.getRepos(LOGIN)
 
     // TODO: Get and print Observable<UserWithRepos> whilst running both requests in parallel
+    userObservable.subscribeOn(Schedulers.io())
+      .zipWith(reposObservable, GitHubConverter::convert)
+      .subscribe(System.out::println)
   }
 
   @Test
@@ -28,6 +32,9 @@ class Task5Threading {
     val reposObservable = gitHubApi.getRepos(LOGIN)
 
     // TODO: Get and print Observable<UserWithRepos> whilst running both requests in serial order using `Schedulers.single()`
+    userObservable.subscribeOn(Schedulers.single())
+      .zipWith(reposObservable.subscribeOn(Schedulers.single()), GitHubConverter::convert)
+      .subscribe(System.out::println)
   }
 
   @Test
@@ -36,6 +43,13 @@ class Task5Threading {
     printWithThreadId("Test thread")
 
     // TODO: Get user and print him on different threads, use `observeOn`, `doOnNext` and `printWithThreadId` methods
+    userObservable.observeOn(
+      Schedulers
+        .newThread()
+    )
+      .doOnNext { printWithThreadId(it) }
+      .observeOn(Schedulers.newThread())
+      .subscribe { this.printWithThreadId(it) }
   }
 
   private fun printWithThreadId(value: Any) {
