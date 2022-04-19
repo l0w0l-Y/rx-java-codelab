@@ -30,7 +30,7 @@ class Task1Basics {
   @Test
   fun receivingError() {
     Observable.error<String>(Exception("Error message"))
-      .subscribe({ println(it) }) { println("Completed: $it") }
+      .subscribe(System.out::println, System.out::println)
     // TODO:  Create Observable which emits an error and print the console (Observable.error), subscribe with onError handling
   }
 
