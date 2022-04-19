@@ -14,14 +14,22 @@ class Task8Testing {
   @Test
   fun testObserver_onColdObservable() {
     val request = httpBinApi.getRequest()
-
+    request.test()
+      .assertSubscribed()
+      .assertValueCount(1)
+      .assertValue { it.url.contains("show_env") }
+      .assertComplete()
     // TODO: Subscribe with test() method to request and assert values count, value has "show_env" in url and no errors were thrown
   }
 
   @Test
   fun testSubscriber_onHotFlowable() {
     val logObservable = rxServer.debugLogsHot()
-
+    logObservable.test()
+      .assertSubscribed()
+      .awaitCount(5)
+      .assertNoErrors()
+      .assertNotComplete()
     // TODO: Subscribe with test() method to rxServer.debugLogsHot, wait for 5 values(awaitCount), assert no errors and stream not completed
   }
 
@@ -35,10 +43,11 @@ class Task8Testing {
 
     subject.onNext("First")
     subject.onNext("Batch")
+    testScheduler.advanceTimeBy(100, TimeUnit.MILLISECONDS)
     subject.onNext("Second")
     subject.onNext("Longer")
     subject.onNext("Batch")
-
+    testScheduler.advanceTimeBy(100, TimeUnit.MILLISECONDS)
     // TODO: Move time of test scheduler so the [First, Batch] and [Second, Longer, Batch] are printed together
   }
 
